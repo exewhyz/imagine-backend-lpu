@@ -1,10 +1,11 @@
+import "dotenv/config"
+
 import express from "express";
 import userRouter from "./routes/user.routes.js";
 import imageRouter from "./routes/image.routes.js";
-// import "dotenv/config"
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 
-dotenv.config();
+// dotenv.config();
 
 const PORT = Number(process.env.PORT) || 4000;
 
