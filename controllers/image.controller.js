@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import fs from "fs";
 
 const genai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -45,25 +46,30 @@ export const generateImages = async (req, res) => {
       contents: prompt.trim(),
     });
 
-    const imageParts = response?.candidates[0]?.content?.parts
+    const imageParts = response?.candidates[0]?.content?.parts;
 
-    const inlineData = imageParts?.find( (part) => part?.inlineData?.data );
-    if(!inlineData) {
+    const inlineData = imageParts?.find((part) => part?.inlineData?.data);
+    if (!inlineData) {
       return res.status(500).json({
         success: false,
         message: "Failed to generate image",
       });
     }
     const data = inlineData?.inlineData?.data;
+
+    const buffer = Buffer.from(data, "base64");
+
+    fs.writeFileSync(`./public/images/generated-image-${Date.now()}.png`, buffer);
+
     const imageUrl = `data:image/png;base64,${data}`;
 
     const image = {
       id: Date.now(),
-      userId : 1,
+      userId: 1,
       prompt: prompt.trim(),
-      alt: prompt.trim().slice(0,10),
-      url: imageUrl
-    }
+      alt: prompt.trim().slice(0, 10),
+      url: imageUrl,
+    };
     images.push(image); // TODO: save image to database
 
     res.status(201).json({
