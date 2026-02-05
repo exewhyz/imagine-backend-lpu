@@ -1,12 +1,16 @@
 import express from "express";
-import userRouter from "./routes/user.routes.js"
+import userRouter from "./routes/user.routes.js";
+import imageRouter from "./routes/image.routes.js";
+// import "dotenv/config"
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const PORT = Number(process.env.PORT) || 4000;
 
 const app = express();
 
 app.use(express.json());
-
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -15,9 +19,8 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/auth", userRouter)
-
-
+app.use("/api/auth", userRouter);
+app.use("/api/images", imageRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is started on http://localhost:${PORT}`);
