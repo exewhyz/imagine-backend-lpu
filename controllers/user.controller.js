@@ -1,3 +1,5 @@
+import { generateToken, hashPassword } from "../lib/utils.js";
+
 const users = [
   {
     id: 1,
@@ -54,6 +56,43 @@ export const getAllUsers = (req, res) => {
 
 export const register = (req, res) => {
   try {
+    const { name, email, password } = req.body;
+
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide valid name, email and password",
+      });
+    }
+    const existingUser = users.find((u) => u.email === email.trim())
+    if(existingUser){
+      return res.status(409).json({
+        success: false,
+        message: "User already exists",
+      })
+    }
+    const hashedPassword = hashPassword(password.trim(), 10)
+
+    const newUser = {
+      id: Date.now(),
+      name: name.trim(),
+      email: email.trim(),
+      password: hashedPassword
+    }
+    users.push(newUser);
+
+    const payload = {
+      id: newUser.id,
+    }
+
+    const token = generateToken(payload);
+
+    res.status(201).json({
+      success :true,
+      message : "Users registered Successfully",
+      token
+    })
+
   } catch (error) {
     res.status(500).json({
       success: false,
