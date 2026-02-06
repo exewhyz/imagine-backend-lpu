@@ -54,7 +54,7 @@ export const getAllUsers = (req, res) => {
   }
 };
 
-export const register = (req, res) => {
+export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -71,7 +71,7 @@ export const register = (req, res) => {
         message: "User already exists",
       });
     }
-    const hashedPassword = hashPassword(password.trim(), 10);
+    const hashedPassword = await hashPassword(password.trim(), 10);
 
     const newUser = {
       id: Date.now(),
@@ -100,7 +100,7 @@ export const register = (req, res) => {
   }
 };
 
-export const login = (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -119,7 +119,8 @@ export const login = (req, res) => {
       })
     }
     
-    const isCorrectPassword = comparePassword(password.trim(),existingUser.password)
+    const isCorrectPassword = await comparePassword(password.trim(),existingUser.password)
+    console.log(isCorrectPassword)
 
     if(!isCorrectPassword){
       return res.status(404).json({
@@ -144,7 +145,7 @@ export const login = (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: `Error while login user: ${error.message}`,
+      error: `Error while login user: ${error}`,
     });
   }
 };
