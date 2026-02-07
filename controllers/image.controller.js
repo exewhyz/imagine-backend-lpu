@@ -17,10 +17,21 @@ const images = [
 
 export const getAllImages = (req, res) => {
   try {
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Please login again",
+      });
+    }
+
+    const filtered = images.filter((image) => image.userId === Number(userId));
+
     //TODO: get images from database
     res.status(200).json({
       success: true,
-      data: images,
+      data: filtered,
       message: "Images fetched successfully",
     });
   } catch (error) {
@@ -33,6 +44,15 @@ export const getAllImages = (req, res) => {
 export const generateImages = async (req, res) => {
   try {
     const { prompt } = req.body;
+
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Please login again",
+      });
+    }
 
     if (!prompt.trim()) {
       return res.status(400).json({
@@ -59,13 +79,16 @@ export const generateImages = async (req, res) => {
 
     const buffer = Buffer.from(data, "base64");
 
-    fs.writeFileSync(`./public/images/generated-image-${Date.now()}.png`, buffer);
+    fs.writeFileSync(
+      `./public/images/generated-image-${Date.now()}.png`,
+      buffer,
+    );
 
     const imageUrl = `data:image/png;base64,${data}`;
 
     const image = {
       id: Date.now(),
-      userId: 1,
+      userId: userId,
       prompt: prompt.trim(),
       alt: prompt.trim().slice(0, 10),
       url: imageUrl,

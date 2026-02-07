@@ -3,9 +3,7 @@ import "dotenv/config"
 import express from "express";
 import userRouter from "./routes/user.routes.js";
 import imageRouter from "./routes/image.routes.js";
-// import dotenv from "dotenv";
-
-// dotenv.config();
+import { verifyUser } from "./midllewares/verify-user.js";
 
 const PORT = Number(process.env.PORT) || 4000;
 
@@ -21,7 +19,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", userRouter);
-app.use("/api/images", imageRouter);
+app.use("/api/images",verifyUser, imageRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is started on http://localhost:${PORT}`);

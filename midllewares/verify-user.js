@@ -2,7 +2,8 @@ import { verifyToken } from "../lib/utils.js";
 
 export const verifyUser = (req, res, next) => {
   try {
-    const authHeader = req.headers.Authorization;
+    console.log("vgjrehjfkd")
+    const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.includes("Bearer")) {
       return res.status(401).json({
         success: false,
@@ -11,6 +12,7 @@ export const verifyUser = (req, res, next) => {
     }
   
     const token = authHeader.split(" ")[1];
+    console.log(token)
   
     if (!token) {
       return res.status(401).json({
