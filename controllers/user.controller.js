@@ -120,7 +120,6 @@ export const login = async (req, res) => {
     }
     
     const isCorrectPassword = await comparePassword(password.trim(),existingUser.password)
-    console.log(isCorrectPassword)
 
     if(!isCorrectPassword){
       return res.status(404).json({
