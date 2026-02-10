@@ -5,6 +5,8 @@ import userRouter from "./routes/user.routes.js";
 import imageRouter from "./routes/image.routes.js";
 import { verifyUser } from "./midllewares/verify-user.js";
 
+import connectDB from "./lib/db.js";
+
 const PORT = Number(process.env.PORT) || 4000;
 
 const app = express();
@@ -21,6 +23,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", userRouter);
 app.use("/api/images",verifyUser, imageRouter);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  await connectDB()
   console.log(`Server is started on http://localhost:${PORT}`);
 });
