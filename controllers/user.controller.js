@@ -1,4 +1,5 @@
 import { comparePassword, generateToken, hashPassword } from "../lib/utils.js";
+import { User } from "../models/user.model.js";
 
 const users = [
   {
@@ -9,12 +10,18 @@ const users = [
   },
 ];
 
-export const getUser = (req, res) => {
+export const getUser = async (req, res) => {
   try {
-    const { id } = req.params;
-    //TODO: fetch user from DB
-    const user = users.find((u) => u.id === Number(id));
-    delete user.password;
+    const id = req.userId;
+    if(!id){
+      return res.status(400).json({
+        success : false,
+        message: "Please Login again"
+      })
+    }
+    // const user = users.find((u) => u.id === Number(id));
+    // delete user.password;
+    const user = await User.findById(id).select("-password");
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -64,7 +71,8 @@ export const register = async (req, res) => {
         message: "Please provide valid name, email and password",
       });
     }
-    const existingUser = users.find((u) => u.email === email.trim());
+    // const existingUser = users.find((u) => u.email === email.trim());
+    const existingUser = await User.findOne({ email : email?.trim() })
     if (existingUser) {
       return res.status(409).json({
         success: false,
@@ -74,12 +82,12 @@ export const register = async (req, res) => {
     const hashedPassword = await hashPassword(password.trim(), 10);
 
     const newUser = {
-      id: Date.now(),
       name: name.trim(),
       email: email.trim(),
       password: hashedPassword,
     };
-    users.push(newUser);
+    // users.push(newUser);
+    await User.create(newUser)
 
     const payload = {
       id: newUser.id,
@@ -111,7 +119,8 @@ export const login = async (req, res) => {
       });
     }
 
-    const existingUser = users.find((u) => u.email === email.trim());
+    // const existingUser = users.find((u) => u.email === email.trim());
+    const existingUser = await User.findOne({ email : email?.trim() })
     if(!existingUser){
       return res.status(404).json({
         success :false,
@@ -139,7 +148,6 @@ export const login = async (req, res) => {
       message: "User logged in successfully",
       token
     })
-
 
   } catch (error) {
     res.status(500).json({
