@@ -81,20 +81,13 @@ export const generateImages = async (req, res) => {
     }
     const data = inlineData?.inlineData?.data;
 
-    // const buffer = Buffer.from(data, "base64");
-
-    // fs.writeFileSync(
-    //   `./public/images/generated-image-${Date.now()}.png`,
-    //   buffer,
-    // );
-
-    const imageUrl = `data:image/png;base64,${data}`;
+    // const imageUrl = `data:image/png;base64,${data}`;
 
     const buffer = Buffer.from(data, "base64");
 
-    console.log((buffer.length / 1024 / 1024).toFixed(2) + " MB");
+    // console.log((buffer.length / 1024 / 1024).toFixed(2) + " MB");
 
-    const savedImage = await saveImage(imageUrl);
+    const savedImage = await saveImage(buffer);
 
     const image = {
       userId: userId,
