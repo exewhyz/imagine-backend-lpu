@@ -15,7 +15,7 @@ userRouter.get("/users", getAllUsers);
 userRouter.get("/user", verifyUser, getUser);
 userRouter.post("/register", register);
 userRouter.post("/login", login);
-userRouter.patch("/user/:id", updateUser);
-userRouter.delete("/user/:id", deleteUser);
+userRouter.patch("/users",verifyUser, updateUser);
+userRouter.delete("/users",verifyUser, deleteUser);
 
 export default userRouter;

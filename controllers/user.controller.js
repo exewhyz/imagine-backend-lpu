@@ -13,11 +13,11 @@ const users = [
 export const getUser = async (req, res) => {
   try {
     const id = req.userId;
-    if(!id){
+    if (!id) {
       return res.status(400).json({
-        success : false,
-        message: "Please Login again"
-      })
+        success: false,
+        message: "Please Login again",
+      });
     }
     // const user = users.find((u) => u.id === Number(id));
     // delete user.password;
@@ -40,17 +40,18 @@ export const getUser = async (req, res) => {
     });
   }
 };
-export const getAllUsers = (req, res) => {
+export const getAllUsers = async (req, res) => {
   try {
-    //TODO: fetch users from DB
-    const updatedUsers = users.map((user) => {
-      delete user.password;
-      return user;
-    });
+    const users = await User.find().select("-password").sort({ name: "-1" });
+
+    // const updatedUsers = users.map((user) => {
+    //   delete user.password;
+    //   return user;
+    // });
 
     res.status(200).json({
       success: true,
-      data: updatedUsers,
+      data: users,
       message: "Users fetched successfully",
     });
   } catch (error) {
@@ -72,7 +73,7 @@ export const register = async (req, res) => {
       });
     }
     // const existingUser = users.find((u) => u.email === email.trim());
-    const existingUser = await User.findOne({ email : email?.trim() })
+    const existingUser = await User.findOne({ email: email?.trim() });
     if (existingUser) {
       return res.status(409).json({
         success: false,
@@ -87,7 +88,7 @@ export const register = async (req, res) => {
       password: hashedPassword,
     };
     // users.push(newUser);
-    await User.create(newUser)
+    await User.create(newUser);
 
     const payload = {
       id: newUser.id,
@@ -120,35 +121,37 @@ export const login = async (req, res) => {
     }
 
     // const existingUser = users.find((u) => u.email === email.trim());
-    const existingUser = await User.findOne({ email : email?.trim() })
-    if(!existingUser){
+    const existingUser = await User.findOne({ email: email?.trim() });
+    if (!existingUser) {
       return res.status(404).json({
-        success :false,
-        message : "Email or Password is invalid"
-      })
+        success: false,
+        message: "Email or Password is invalid",
+      });
     }
-    
-    const isCorrectPassword = await comparePassword(password.trim(),existingUser.password)
 
-    if(!isCorrectPassword){
+    const isCorrectPassword = await comparePassword(
+      password.trim(),
+      existingUser.password,
+    );
+
+    if (!isCorrectPassword) {
       return res.status(404).json({
-        success :false,
-        message : "Email or Password is invalid"
-      })
+        success: false,
+        message: "Email or Password is invalid",
+      });
     }
 
     const payload = {
-      id: existingUser.id
-    }
+      id: existingUser.id,
+    };
 
-    const token = generateToken(payload)
+    const token = generateToken(payload);
 
     res.status(200).json({
-      success :true,
+      success: true,
       message: "User logged in successfully",
-      token
-    })
-
+      token,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -156,8 +159,43 @@ export const login = async (req, res) => {
     });
   }
 };
-export const updateUser = (req, res) => {
+export const updateUser = async (req, res) => {
   try {
+    const data = req.body;
+    const id = req.userId;
+    if(!id){
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized...Please login again"
+      })
+    }
+    // for(let key in data){
+    //   if(key !== "name" || key !== "email"){
+    //     return res.status(400).json({
+    //       success: false,
+    //       message: "Please provide only name, email or both"
+    //     })
+    //   }
+    // }
+    delete data?.password;
+    delete data?._id;
+    delete data?.role;
+
+    const user = await User.findByIdAndUpdate(id, { $set: data }, { new : true})
+
+    if(!user) {
+      return res.status(404).json({
+        success :false,
+        message : "User not found...Please login again"
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user,
+      message: "User updated successfully",
+    });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -165,8 +203,27 @@ export const updateUser = (req, res) => {
     });
   }
 };
-export const deleteUser = (req, res) => {
+export const deleteUser = async (req, res) => {
   try {
+    const id = req.userId;
+    if(!id){
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized...Please login again"
+      })
+    }
+    const deletedUser = await User.findByIdAndDelete(id).select("-password");
+    if(!deletedUser) {
+      return res.status(404).json({
+        success :false,
+        message : "User not found...Please login again"
+      })
+    }
+    res.status(200).json({
+      success: true,
+      data: deletedUser,
+      message: "User deleted successfully",
+    });
   } catch (error) {
     res.status(500).json({
       success: false,

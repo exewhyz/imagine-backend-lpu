@@ -18,6 +18,6 @@ const userSchema = new Schema({
         type: String,
         deafult : "user"
     }
-})
+}, { timestamps : true })
 
 export const User = model("User", userSchema);
