@@ -22,6 +22,8 @@ PORT=4000
 GEMINI_API_KEY=your_api_key
 JWT_SECRET=your_secret
 JWT_EXPIRE_TIME=24h
+MONGODB_URI="add-your-db-url"
+CLOUDINARY_API_SECRET="add-your-cloudinary-secret-key"
 ````
 
 ## How to Run
