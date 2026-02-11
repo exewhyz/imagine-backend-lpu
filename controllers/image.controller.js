@@ -1,23 +1,13 @@
 import { GoogleGenAI } from "@google/genai";
-import fs from "fs";
 
 import { Image } from "../models/image.model.js";
 
+import {v2 as cloudinary} from "cloudinary"
 import saveImage from "../lib/cdn.js";
 
 const genai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
-
-const images = [
-  {
-    id: 1,
-    userId: 1,
-    url: "https://images.unsplash.com/photo-1761839259488-2bdeeae794f5?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxfHx8ZW58MHx8fHx8",
-    prompt: "Small town street",
-    alt: "Small town street",
-  },
-];
 
 export const getAllImages = async (req, res) => {
   try {
@@ -89,12 +79,21 @@ export const generateImages = async (req, res) => {
 
     const savedImage = await saveImage(buffer);
 
+    // const thumbnail = cloudinary.url(savedImage?.public_id,{
+    //   width: 300,
+    //   height:300,
+    //   crop: "fill",
+    //   quality: "auto",
+    //   format: "webp"
+    // })
+
     const image = {
       userId: userId,
       prompt: prompt.trim(),
       alt: prompt.trim().slice(0, 15),
       url: savedImage?.secure_url,
       public_id: savedImage?.public_id,
+      // thumbnail
     };
     // images.push(image);
     await Image.create(image);
