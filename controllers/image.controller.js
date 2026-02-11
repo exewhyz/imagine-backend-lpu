@@ -90,6 +90,10 @@ export const generateImages = async (req, res) => {
 
     const imageUrl = `data:image/png;base64,${data}`;
 
+    const buffer = Buffer.from(data, "base64");
+
+    console.log((buffer.length / 1024 / 1024).toFixed(2) + " MB");
+
     const savedImage = await saveImage(imageUrl);
 
     const image = {
@@ -97,11 +101,11 @@ export const generateImages = async (req, res) => {
       prompt: prompt.trim(),
       alt: prompt.trim().slice(0, 15),
       url: savedImage?.secure_url,
-      public_id: savedImage?.public_id
+      public_id: savedImage?.public_id,
     };
     // images.push(image);
     await Image.create(image);
-    
+
     res.status(201).json({
       success: true,
       data: image,
