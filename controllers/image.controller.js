@@ -3,6 +3,8 @@ import fs from "fs";
 
 import { Image } from "../models/image.model.js";
 
+import saveImage from "../lib/cdn.js";
+
 const genai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
@@ -29,7 +31,7 @@ export const getAllImages = async (req, res) => {
     }
 
     // const filtered = images.filter((image) => image.userId === Number(userId));
-    const images = await Image.find({ userId }).sort({ createdAt : -1});
+    const images = await Image.find({ userId }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -79,24 +81,27 @@ export const generateImages = async (req, res) => {
     }
     const data = inlineData?.inlineData?.data;
 
-    const buffer = Buffer.from(data, "base64");
+    // const buffer = Buffer.from(data, "base64");
 
-    fs.writeFileSync(
-      `./public/images/generated-image-${Date.now()}.png`,
-      buffer,
-    );
+    // fs.writeFileSync(
+    //   `./public/images/generated-image-${Date.now()}.png`,
+    //   buffer,
+    // );
 
     const imageUrl = `data:image/png;base64,${data}`;
 
+    const savedImage = await saveImage(imageUrl);
+
     const image = {
-      id: Date.now(),
       userId: userId,
       prompt: prompt.trim(),
-      alt: prompt.trim().slice(0, 10),
-      url: imageUrl,
+      alt: prompt.trim().slice(0, 15),
+      url: savedImage?.secure_url,
+      public_id: savedImage?.public_id
     };
-    images.push(image); // TODO: save image to database
-
+    // images.push(image);
+    await Image.create(image);
+    
     res.status(201).json({
       success: true,
       data: image,

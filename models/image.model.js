@@ -10,6 +10,10 @@ const imageSchema = new Schema(
       type: String,
       default: "ai-image",
     },
+    public_id : {
+      type: String,
+      required : true
+    },
     url: {
       type: String,
       required: true,
