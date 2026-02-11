@@ -1,6 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 
+import { Image } from "../models/image.model.js";
+
 const genai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
@@ -15,7 +17,7 @@ const images = [
   },
 ];
 
-export const getAllImages = (req, res) => {
+export const getAllImages = async (req, res) => {
   try {
     const userId = req.userId;
 
@@ -26,12 +28,12 @@ export const getAllImages = (req, res) => {
       });
     }
 
-    const filtered = images.filter((image) => image.userId === Number(userId));
+    // const filtered = images.filter((image) => image.userId === Number(userId));
+    const images = await Image.find({ userId }).sort({ createdAt : -1});
 
-    //TODO: get images from database
     res.status(200).json({
       success: true,
-      data: filtered,
+      data: images,
       message: "Images fetched successfully",
     });
   } catch (error) {

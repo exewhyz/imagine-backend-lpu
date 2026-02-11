@@ -1,15 +1,6 @@
 import { comparePassword, generateToken, hashPassword } from "../lib/utils.js";
 import { User } from "../models/user.model.js";
 
-const users = [
-  {
-    id: 1,
-    email: "aniket@gmail.com",
-    name: "Aniket Raj",
-    password: "hashed_password_1",
-  },
-];
-
 export const getUser = async (req, res) => {
   try {
     const id = req.userId;
