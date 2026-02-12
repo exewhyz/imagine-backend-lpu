@@ -8,10 +8,11 @@ import {
   register,
 } from "../controllers/user.controller.js";
 import { verifyUser } from "../midllewares/verify-user.js";
+import { verifyRole } from "../midllewares/verify-role.js";
 
 const userRouter = Router();
 
-userRouter.get("/users", getAllUsers);
+userRouter.get("/users",verifyUser,verifyRole, getAllUsers);
 userRouter.get("/user", verifyUser, getUser);
 userRouter.post("/register", register);
 userRouter.post("/login", login);
